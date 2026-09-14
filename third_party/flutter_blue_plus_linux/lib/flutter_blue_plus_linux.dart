@@ -53,6 +53,13 @@ final class FlutterBluePlusLinux extends FlutterBluePlusPlatform {
   final _onDiscoveredServicesController = StreamController<BmDiscoverServicesResult>.broadcast();
   final _onReadRssiController = StreamController<BmReadRssiResult>.broadcast();
   final _onTurnOnResponseController = StreamController<BmTurnOnResponse>.broadcast();
+  final _onScanResponseController = StreamController<BmScanResponse>.broadcast();
+
+  // Active scan state. BlueZ only emits InterfacesAdded for devices it does not
+  // already know, so paired/cached devices are reported via property changes.
+  List<Guid> _scanWithServices = const [];
+  StreamSubscription<BlueZDevice>? _scanDeviceAddedSubscription;
+  final _scanDevicePropertySubscriptions = <String, StreamSubscription<List<String>>>{};
 
   List<BlueZGattService> _matchingServices(BlueZDevice device, Guid serviceUuid) {
     return device.gattServices.where((service) => service.guid == serviceUuid).toList();
@@ -293,41 +300,87 @@ final class FlutterBluePlusLinux extends FlutterBluePlusPlatform {
 
   @override
   Stream<BmScanResponse> get onScanResponse {
-    return _client.deviceAdded.map(
-      (device) {
-        return BmScanResponse(
-          advertisements: [
-            BmScanAdvertisement(
-              remoteId: device.remoteId,
-              platformName: device.name,
-              advName: null,
-              connectable: true,
-              txPowerLevel: device.txPower,
-              appearance: device.appearance,
-              manufacturerData: device.manufacturerData.map(
-                (id, value) {
-                  return MapEntry(id.id, value);
-                },
-              ),
-              serviceData: device.serviceData.map(
-                (uuid, value) {
-                  return MapEntry(Guid.fromBytes(uuid.value), value);
-                },
-              ),
-              serviceUuids: device.uuids.map(
-                (uuid) {
-                  return Guid.fromBytes(uuid.value);
-                },
-              ).toList(),
-              rssi: device.rssi,
-            ),
-          ],
-          success: true,
-          errorCode: 0,
-          errorString: '',
-        );
+    return _onScanResponseController.stream;
+  }
+
+  static const _scanAdvertisementProperties = {
+    'RSSI',
+    'ManufacturerData',
+    'ServiceData',
+    'UUIDs',
+    'Name',
+    'TxPower',
+  };
+
+  bool _matchesScanFilter(BlueZDevice device) {
+    if (_scanWithServices.isEmpty) {
+      return true;
+    }
+    return device.uuids.any(
+      (uuid) {
+        return _scanWithServices.contains(Guid.fromBytes(uuid.value));
       },
     );
+  }
+
+  void _emitScanResponse(BlueZDevice device) {
+    // RSSI is 0 when the device has not been seen advertising in this scan.
+    if (device.rssi == 0 || !_matchesScanFilter(device)) {
+      return;
+    }
+    _onScanResponseController.add(
+      BmScanResponse(
+        advertisements: [
+          BmScanAdvertisement(
+            remoteId: device.remoteId,
+            platformName: device.name,
+            advName: null,
+            connectable: true,
+            txPowerLevel: device.txPower,
+            appearance: device.appearance,
+            manufacturerData: device.manufacturerData.map(
+              (id, value) {
+                return MapEntry(id.id, value);
+              },
+            ),
+            serviceData: device.serviceData.map(
+              (uuid, value) {
+                return MapEntry(Guid.fromBytes(uuid.value), value);
+              },
+            ),
+            serviceUuids: device.uuids.map(
+              (uuid) {
+                return Guid.fromBytes(uuid.value);
+              },
+            ).toList(),
+            rssi: device.rssi,
+          ),
+        ],
+        success: true,
+        errorCode: 0,
+        errorString: '',
+      ),
+    );
+  }
+
+  void _watchScanDevice(BlueZDevice device) {
+    _scanDevicePropertySubscriptions[device.address]?.cancel();
+    _scanDevicePropertySubscriptions[device.address] = device.propertiesChanged.listen(
+      (properties) {
+        if (properties.any(_scanAdvertisementProperties.contains)) {
+          _emitScanResponse(device);
+        }
+      },
+    );
+  }
+
+  Future<void> _cancelScanWatchers() async {
+    await _scanDeviceAddedSubscription?.cancel();
+    _scanDeviceAddedSubscription = null;
+    for (final subscription in _scanDevicePropertySubscriptions.values) {
+      await subscription.cancel();
+    }
+    _scanDevicePropertySubscriptions.clear();
   }
 
   @override
@@ -601,7 +654,16 @@ final class FlutterBluePlusLinux extends FlutterBluePlusPlatform {
     await _initFlutterBluePlus();
 
     return BmDevicesList(
-      devices: _client.devices.map(
+      devices: _client.devices.where(
+        (device) {
+          return request.withServices.isEmpty ||
+              device.uuids.any(
+                (uuid) {
+                  return request.withServices.contains(Guid.fromBytes(uuid.value));
+                },
+              );
+        },
+      ).map(
         (device) {
           return BmBluetoothDevice(
             remoteId: device.remoteId,
@@ -851,15 +913,29 @@ final class FlutterBluePlusLinux extends FlutterBluePlusPlatform {
       return false;
     }
 
-    await adapter.setDiscoveryFilter(
-      uuids: request.withServices.map(
-        (uuid) {
-          return uuid.str128;
-        },
-      ).toList(),
+    await _cancelScanWatchers();
+    _scanWithServices = request.withServices;
+    _scanDeviceAddedSubscription = _client.deviceAdded.listen(
+      (device) {
+        _watchScanDevice(device);
+        _emitScanResponse(device);
+      },
     );
+    for (final device in _client.devices) {
+      _watchScanDevice(device);
+    }
 
-    await adapter.startDiscovery();
+    // Service UUIDs are matched in Dart rather than through the BlueZ discovery
+    // filter, which was implicated in a bluetoothd 5.87 segfault.
+    try {
+      await adapter.setDiscoveryFilter(transport: 'le');
+      await adapter.startDiscovery();
+    } on BlueZInProgressException {
+      // Discovery is already running for this client.
+    } catch (_) {
+      await _cancelScanWatchers();
+      rethrow;
+    }
 
     return true;
   }
@@ -876,7 +952,14 @@ final class FlutterBluePlusLinux extends FlutterBluePlusPlatform {
       return false;
     }
 
-    await adapter.stopDiscovery();
+    await _cancelScanWatchers();
+
+    try {
+      await adapter.stopDiscovery();
+    } on BlueZFailedException {
+      // "No discovery started": the scan already ended, e.g. because
+      // bluetoothd restarted. It is stopped either way.
+    }
 
     return true;
   }

@@ -93,6 +93,12 @@ hooks:
           android-x64:
             backends: [cpu]
 
+dependency_overrides:
+  # Local BlueZ scan fixes: paired devices were never reported and stopScan
+  # threw "No discovery started". See third_party/flutter_blue_plus_linux.
+  flutter_blue_plus_linux:
+    path: third_party/flutter_blue_plus_linux
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
