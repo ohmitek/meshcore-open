@@ -419,6 +419,7 @@ class _MeshCoreAppState extends State<MeshCoreApp> with WidgetsBindingObserver {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
+            localeListResolutionCallback: _resolveLocale,
             locale: _localeFromSetting(
               settingsService.settings.languageOverride,
             ),
@@ -477,5 +478,21 @@ class _MeshCoreAppState extends State<MeshCoreApp> with WidgetsBindingObserver {
   Locale? _localeFromSetting(String? languageCode) {
     if (languageCode == null) return null;
     return Locale(languageCode);
+  }
+
+  // Flutter's default resolution falls back to the first supported locale,
+  // which is alphabetically 'bg', so e.g. a Finnish browser got Bulgarian.
+  Locale _resolveLocale(
+    List<Locale>? preferredLocales,
+    Iterable<Locale> supportedLocales,
+  ) {
+    for (final preferred in preferredLocales ?? const <Locale>[]) {
+      for (final supported in supportedLocales) {
+        if (supported.languageCode == preferred.languageCode) {
+          return supported;
+        }
+      }
+    }
+    return const Locale('en');
   }
 }

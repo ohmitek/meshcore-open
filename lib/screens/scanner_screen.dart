@@ -207,24 +207,28 @@ class _ScannerScreenState extends State<ScannerScreen> {
   }
 
   void _toggleScan(MeshCoreConnector connector) {
-    if (PlatformInfo.isWeb) {
-      // flutter_blue_plus has no web backend, so a BLE scan silently no-ops in
-      // the browser. Tell the user instead of leaving them staring at a button.
+    if (connector.state == MeshCoreConnectionState.scanning) {
+      connector.stopScan();
+    } else {
+      unawaited(_startScan(connector));
+    }
+  }
+
+  Future<void> _startScan(MeshCoreConnector connector) async {
+    // On the web, scanning opens the browser's Web Bluetooth device picker.
+    // Only Chromium browsers provide it, and it can be disabled (e.g. behind a
+    // flag on Linux), so tell the user instead of failing silently.
+    if (PlatformInfo.isWeb && !await FlutterBluePlus.isSupported) {
+      if (!mounted) return;
       showDismissibleSnackBar(
         context,
         content: Text(context.l10n.scanner_bluetoothWebUnsupported),
       );
       return;
     }
-    if (connector.state == MeshCoreConnectionState.scanning) {
-      connector.stopScan();
-    } else {
-      unawaited(
-        connector.startScan().catchError((e) {
-          appLogger.warn('startScan error: $e', tag: 'ScannerScreen');
-        }),
-      );
-    }
+    await connector.startScan().catchError((e) {
+      appLogger.warn('startScan error: $e', tag: 'ScannerScreen');
+    });
   }
 
   Widget _buildDeviceList(BuildContext context, MeshCoreConnector connector) {
