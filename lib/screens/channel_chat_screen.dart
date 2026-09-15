@@ -358,11 +358,25 @@ class _ChannelChatScreenState extends State<ChannelChatScreen> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert),
             onSelected: (value) {
-              if (value == 'clearChat') {
+              if (value == 'messageSound') {
+                final settingsService = context.read<AppSettingsService>();
+                settingsService.setMessageSoundEnabled(
+                  !settingsService.settings.messageSoundEnabled,
+                );
+              } else if (value == 'clearChat') {
                 _confirmClearChat();
               }
             },
             itemBuilder: (context) => [
+              if (PlatformInfo.isWeb)
+                CheckedPopupMenuItem(
+                  value: 'messageSound',
+                  checked: context
+                      .read<AppSettingsService>()
+                      .settings
+                      .messageSoundEnabled,
+                  child: Text(context.l10n.appSettings_messageSound),
+                ),
               PopupMenuItem(
                 value: 'clearChat',
                 child: Row(

@@ -156,6 +156,10 @@ class AppSettingsService extends ChangeNotifier {
     await updateSettings(_settings.copyWith(notifyOnNewAdvert: value));
   }
 
+  Future<void> setMessageSoundEnabled(bool value) async {
+    await updateSettings(_settings.copyWith(messageSoundEnabled: value));
+  }
+
   Future<void> setAutoSendZeroHopAdvertOnGpsUpdate(bool value) async {
     await updateSettings(
       _settings.copyWith(autoSendZeroHopAdvertOnGpsUpdate: value),

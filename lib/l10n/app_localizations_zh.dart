@@ -761,6 +761,13 @@ class AppLocalizationsZh extends AppLocalizations {
   String get appSettings_advertisementNotificationsSubtitle => '发现新节点时显示通知';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => '消息';
 
   @override

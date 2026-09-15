@@ -40,6 +40,7 @@ import '../services/app_settings_service.dart';
 import '../services/background_service.dart';
 import '../services/timeout_prediction_service.dart';
 import '../services/translation_service.dart';
+import '../services/message_sound_service.dart';
 import '../services/notification_service.dart';
 import 'meshcore_connector_usb.dart';
 import 'meshcore_connector_tcp.dart';
@@ -360,6 +361,7 @@ class MeshCoreConnector extends ChangeNotifier {
   AppSettingsService? _appSettingsService;
   BackgroundService? _backgroundService;
   final NotificationService _notificationService = NotificationService();
+  final MessageSoundService _messageSoundService = MessageSoundService();
   BleDebugLogService? _bleDebugLogService;
   AppDebugLogService? _appDebugLogService;
   final ChannelMessageStore _channelMessageStore = ChannelMessageStore();
@@ -5304,6 +5306,9 @@ class MeshCoreConnector extends ChangeNotifier {
       _addMessage(message.senderKeyHex, message);
       _maybeIncrementContactUnread(message);
       notifyListeners();
+      if (!message.isOutgoing && !message.isCli) {
+        _maybePlayMessageSound();
+      }
 
       // Show notification for new incoming message (run async with translation)
       if (!message.isOutgoing &&
@@ -5618,6 +5623,18 @@ class MeshCoreConnector extends ChangeNotifier {
     return 'Channel $channelIndex';
   }
 
+  void _maybePlayMessageSound({String? channelName}) {
+    final settingsService = _appSettingsService;
+    if (settingsService == null ||
+        !settingsService.settings.messageSoundEnabled) {
+      return;
+    }
+    if (channelName != null && settingsService.isChannelMuted(channelName)) {
+      return;
+    }
+    _messageSoundService.play();
+  }
+
   void _maybeNotifyChannelMessage(
     ChannelMessage message, {
     String? channelName,
@@ -5694,6 +5711,9 @@ class MeshCoreConnector extends ChangeNotifier {
       _maybeIncrementChannelUnread(message, isNew: isNew);
       notifyListeners();
       if (isNew && !message.isOutgoing) {
+        _maybePlayMessageSound(
+          channelName: _channelDisplayName(message.channelIndex!),
+        );
         final msg = message; // capture for closure
         unawaited(() async {
           final translationResult = await translateChannelMessage(
@@ -5782,15 +5802,18 @@ class MeshCoreConnector extends ChangeNotifier {
           _maybeIncrementChannelUnread(message, isNew: isNew);
           notifyListeners();
           if (isNew) {
+            final label = channel.name.isEmpty
+                ? 'Channel ${channel.index}'
+                : channel.name;
+            if (!message.isOutgoing) {
+              _maybePlayMessageSound(channelName: label);
+            }
             // Run translation + notification asynchronously to avoid blocking
             unawaited(() async {
               final translationResult = await translateChannelMessage(
                 channel.index,
                 message,
               );
-              final label = channel.name.isEmpty
-                  ? 'Channel ${channel.index}'
-                  : channel.name;
               _maybeNotifyChannelMessage(
                 message,
                 channelName: label,

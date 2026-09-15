@@ -808,6 +808,13 @@ class AppLocalizationsEs extends AppLocalizations {
       'Mostrar notificación cuando se descubren nuevos nodos';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Mensajería';
 
   @override

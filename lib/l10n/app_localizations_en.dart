@@ -795,6 +795,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Show notification when new nodes are discovered';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Messaging';
 
   @override

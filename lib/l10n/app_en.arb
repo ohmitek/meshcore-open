@@ -312,6 +312,8 @@
   "appSettings_channelMessageNotificationsSubtitle": "Show notification when receiving channel messages",
   "appSettings_advertisementNotifications": "Advertisement Notifications",
   "appSettings_advertisementNotificationsSubtitle": "Show notification when new nodes are discovered",
+  "appSettings_messageSound": "Message Sound",
+  "appSettings_messageSoundSubtitle": "Play a sound when a new message arrives",
   "appSettings_messaging": "Messaging",
   "appSettings_clearPathOnMaxRetry": "Clear Path on Max Retry",
   "appSettings_clearPathOnMaxRetrySubtitle": "Reset contact path after 5 failed send attempts",

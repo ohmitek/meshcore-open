@@ -773,6 +773,13 @@ class AppLocalizationsKo extends AppLocalizations {
       '새 노드가 발견되었을 때 알림 표시';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => '메시징';
 
   @override

@@ -812,6 +812,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Mostra notifica quando vengono scoperti nuovi nodi';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Messaggi';
 
   @override

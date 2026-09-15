@@ -800,6 +800,13 @@ class AppLocalizationsSl extends AppLocalizations {
       'Pokaži obvestilo, ko so najdene nove naprave.';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Komuniciranje';
 
   @override

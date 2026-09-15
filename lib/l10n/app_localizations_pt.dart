@@ -810,6 +810,13 @@ class AppLocalizationsPt extends AppLocalizations {
       'Mostrar notificação quando novos nós forem descobertos';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Mensagens';
 
   @override

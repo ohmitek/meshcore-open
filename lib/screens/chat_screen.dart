@@ -251,6 +251,12 @@ class _ChatScreenState extends State<ChatScreen> {
                               TelemetryScreen(contact: widget.contact),
                         ),
                       );
+                    case 'messageSound':
+                      final settingsService = context
+                          .read<AppSettingsService>();
+                      settingsService.setMessageSoundEnabled(
+                        !settingsService.settings.messageSoundEnabled,
+                      );
                     case 'clearChat':
                       _confirmClearChat(context, connector);
                   }
@@ -296,6 +302,15 @@ class _ChatScreenState extends State<ChatScreen> {
                       ],
                     ),
                   ),
+                  if (PlatformInfo.isWeb)
+                    CheckedPopupMenuItem(
+                      value: 'messageSound',
+                      checked: context
+                          .read<AppSettingsService>()
+                          .settings
+                          .messageSoundEnabled,
+                      child: Text(context.l10n.appSettings_messageSound),
+                    ),
                   PopupMenuItem(
                     value: 'clearChat',
                     child: Row(

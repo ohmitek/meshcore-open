@@ -1,1 +1,103 @@
-{}
+{
+  "bg": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "de": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "es": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "fr": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "hu": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "it": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "ja": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "ko": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "nl": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "pl": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "pt": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "ru": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "sk": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "sl": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "sv": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "uk": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ],
+
+  "zh": [
+    "appSettings_messageSound",
+    "appSettings_messageSoundSubtitle",
+    "reaction_report"
+  ]
+}

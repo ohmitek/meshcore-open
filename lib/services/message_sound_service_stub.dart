@@ -1,0 +1,3 @@
+class MessageSoundService {
+  void play() {}
+}

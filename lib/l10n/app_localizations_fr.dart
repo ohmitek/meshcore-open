@@ -813,6 +813,13 @@ class AppLocalizationsFr extends AppLocalizations {
       'Afficher une notification lors de la découverte de nouveaux nœuds';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Messagerie';
 
   @override

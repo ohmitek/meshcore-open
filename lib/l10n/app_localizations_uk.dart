@@ -805,6 +805,13 @@ class AppLocalizationsUk extends AppLocalizations {
       'Показувати сповіщення при виявленні нових вузлів';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Обмін повідомленнями';
 
   @override

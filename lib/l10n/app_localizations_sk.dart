@@ -800,6 +800,13 @@ class AppLocalizationsSk extends AppLocalizations {
       'Zobraziť upozornenie, keď sa objavia nové uzly.';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Správy';
 
   @override

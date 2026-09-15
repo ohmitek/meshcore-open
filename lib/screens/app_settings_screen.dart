@@ -376,6 +376,20 @@ class AppSettingsScreen extends StatelessWidget {
               ? (value) => settingsService.setNotifyOnNewAdvert(value)
               : null,
         ),
+        if (kIsWeb) ...[
+          const Divider(height: 1, indent: 16),
+          SwitchListTile(
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 4,
+            ),
+            secondary: const Icon(Icons.volume_up_outlined, size: 20),
+            title: Text(context.l10n.appSettings_messageSound),
+            subtitle: Text(context.l10n.appSettings_messageSoundSubtitle),
+            value: settingsService.settings.messageSoundEnabled,
+            onChanged: settingsService.setMessageSoundEnabled,
+          ),
+        ],
       ],
     );
   }

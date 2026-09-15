@@ -1582,6 +1582,18 @@ abstract class AppLocalizations {
   /// **'Show notification when new nodes are discovered'**
   String get appSettings_advertisementNotificationsSubtitle;
 
+  /// No description provided for @appSettings_messageSound.
+  ///
+  /// In en, this message translates to:
+  /// **'Message Sound'**
+  String get appSettings_messageSound;
+
+  /// No description provided for @appSettings_messageSoundSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Play a sound when a new message arrives'**
+  String get appSettings_messageSoundSubtitle;
+
   /// No description provided for @appSettings_messaging.
   ///
   /// In en, this message translates to:

@@ -813,6 +813,13 @@ class AppLocalizationsRu extends AppLocalizations {
       'Показывать уведомление при обнаружении новых нод';
 
   @override
+  String get appSettings_messageSound => 'Message Sound';
+
+  @override
+  String get appSettings_messageSoundSubtitle =>
+      'Play a sound when a new message arrives';
+
+  @override
   String get appSettings_messaging => 'Обмен сообщениями';
 
   @override
